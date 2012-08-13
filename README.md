@@ -8,7 +8,7 @@
   * page faults
   * and other information
 
-In contrast to additional tools, *audria* is designed to run in batch mode at very small intervals.
+In contrast to additional tools, *audria* is designed to run in batch mode at very short intervals.
 This allows very detailed inspections of the ressource usage of a process.
 
 # Usage
