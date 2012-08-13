@@ -8,7 +8,9 @@
   * page faults
   * and other information
 
-In contrast to additional tools, *audria* is designed to run in batch mode at very short intervals.
+*audria* can be used to monitor a single process, a group of processes or all currently running processes.
+Furthermore it is possible to specify a command to execute in order to watch a process directly from startup.
+In contrast to some other tools, *audria* is designed to run in batch mode at very short intervals.
 This allows very detailed inspections of the ressource usage of a process.
 
 # Usage
