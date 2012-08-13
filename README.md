@@ -1,4 +1,4 @@
-# audria - A Utility for Detailed Ressource Inspection of Applications
+# audria - A Utility for Detailed Resource Inspection of Applications
 
 *audria* is a little tool designed to read various program statistics from the */proc* filesystem, including:
   * current and average CPU usage
@@ -11,7 +11,7 @@
 *audria* can be used to monitor a single process, a group of processes or all currently running processes.
 Furthermore it is possible to specify a command to execute in order to watch a process directly from startup.
 In contrast to some other tools, *audria* is designed to run in batch mode at very short intervals.
-This allows very detailed inspections of the ressource usage of a process.
+This allows very detailed inspections of the resource usage of a process.
 
 # Usage
 
