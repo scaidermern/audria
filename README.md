@@ -15,6 +15,7 @@ This allows very detailed inspections of the ressource usage of a process.
 
 *audria* has several command line arguments:
 
+    PID(s)   PID(s) to monitor
     -a       monitor all processes
     -d       delay in seconds between intervals (default: 0.5)
     -e       program to execute and watch, all remaining arguments will be forwarded
