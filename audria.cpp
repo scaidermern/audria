@@ -60,6 +60,7 @@
 #include <errno.h>
 #include <sched.h>
 #include <sys/resource.h>
+#include <sys/wait.h>
 #include <unistd.h>
 
 /// checks if all values in the current cache seem reasonable, just for debugging
@@ -74,6 +75,8 @@ void checkCacheConsistency(const Cache& curCache, const Cache& oldCache) {
     assert(curCache.totReadBytesStorage >= oldCache.totReadBytesStorage || curCache.totReadBytesStorage == 0);
     assert(curCache.totWrittenBytes >= oldCache.totWrittenBytes || curCache.totWrittenBytes == 0);
     assert(curCache.totWrittenBytesStorage >= oldCache.totWrittenBytesStorage || curCache.totWrittenBytesStorage == 0);
+    assert(curCache.totReadCalls >= oldCache.totReadCalls || curCache.totReadCalls == 0);
+    assert(curCache.totWriteCalls >= oldCache.totWriteCalls || curCache.totWriteCalls == 0);
 }
 
 void printUsage(const std::string& name) {
@@ -198,11 +201,12 @@ int main(int argc, char* argv[]) {
     }
 
     // execute command if specified
+    pid_t childPid = -1;
     if (!executeCmd.empty()) {
-        const pid_t pid = fork();
-        if (pid == -1) {
+        childPid = fork();
+        if (childPid == -1) {
             std::cerr << "fork failed: " << strerror(errno) << std::endl;
-        } else if (pid == 0) {
+        } else if (childPid == 0) {
             // we are the child, execute specified command
             executeCmd.push_back(NULL); // last argument must be NULL
             if (execvp(executeCmd[0], &executeCmd[0]) == -1) {
@@ -211,8 +215,9 @@ int main(int argc, char* argv[]) {
             }
         } else {
             // we are the parent, add executed command to watch list
-            const std::string& pidStr = numberToString(pid);
-            processes.insert(std::make_pair(pidStr, Process(pidStr)));
+            std::cerr << "successfully spawned child " << childPid << std::endl;
+            const std::string& childPidStr = numberToString(childPid);
+            processes.insert(std::make_pair(childPidStr, Process(childPidStr)));
         }
     }
     
@@ -255,6 +260,12 @@ int main(int argc, char* argv[]) {
     
     int i = 0;
     while (iterations == 0 || ++i <= iterations) {
+        // check if process to execute is still running
+        if (childPid != -1 && !waitpid(childPid, 0, WNOHANG) == 0) {
+            std::cerr << "child " << childPid << " terminated, exiting" << std::endl;
+            exit(EXIT_SUCCESS);
+        }
+
         // check if all processes still exist, remove terminated ones
         for (ProcessMap::iterator processIt = processes.begin(); processIt != processes.end(); ) {
             if (!processIt->second.exists()) {
@@ -277,7 +288,7 @@ int main(int argc, char* argv[]) {
 
         if (unlikely(processes.empty())) {
             std::cerr << "no more processes to watch, exiting" << std::endl;
-            exit(EXIT_FAILURE);
+            exit(EXIT_SUCCESS);
         }
 
         for (ProcessMap::iterator processIt = processes.begin(); processIt != processes.end(); ++processIt) {

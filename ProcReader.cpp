@@ -100,6 +100,9 @@ void ProcReader::readProcessStatus() {
         std::stringstream sstr(line);
         std::string name, value;
         sstr >> name >> value;
+        if (!sstr) {
+            continue; // we just read some crap
+        }
         assert(!name.empty());
         assert(!value.empty() || name == "Groups:");
         
@@ -143,7 +146,9 @@ void ProcReader::readProcessIO() {
         assert(sstr);
         std::string name, value;
         sstr >> name >> value;
-        assert(sstr);
+        if (!sstr) {
+            continue; // we just read some crap
+        }
         assert(!name.empty());
         assert(!value.empty());
         
@@ -255,6 +260,8 @@ void ProcReader::calcIOUtilization(const Cache& oldCache, const double elapsedSe
     status[CurWrittenBytes]        = numberToString((cache.totWrittenBytes - oldCache.totWrittenBytes) / elapsedSecs);
     status[CurReadBytesStorage]    = numberToString((cache.totReadBytesStorage - oldCache.totReadBytesStorage) / elapsedSecs);
     status[CurWrittenBytesStorage] = numberToString((cache.totWrittenBytesStorage - oldCache.totWrittenBytesStorage) / elapsedSecs);
+    status[CurReadCalls]           = numberToString((cache.totReadCalls - oldCache.totReadCalls) / elapsedSecs);
+    status[CurWriteCalls]          = numberToString((cache.totWriteCalls - oldCache.totWriteCalls) / elapsedSecs);
 }
 
 PIDSet ProcReader::pids() {

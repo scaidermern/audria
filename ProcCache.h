@@ -26,6 +26,8 @@ class Cache {
     unsigned long long totReadBytesStorage;
     unsigned long long totWrittenBytes;
     unsigned long long totWrittenBytesStorage;
+    unsigned long long totReadCalls;
+    unsigned long long totWriteCalls;
 };
 
 #endif // PROC_CACHE_H

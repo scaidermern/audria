@@ -40,7 +40,9 @@ typedef enum {
     TotWrittenBytesStorage, ///< total bytes written (excl. cached)
     CurWrittenBytesStorage, ///< current bytes written (excl. cached), per second
     TotReadCalls,           ///< total calls to read()/pread()
+    CurReadCalls,           ///< current calls to read()/pread()
     TotWriteCalls,          ///< total calls to write()/pwrite()
+    CurWriteCalls,          ///< current calls to write()/pwrite()
     StatusColumnCount
 } StatusColumns;
 
@@ -51,7 +53,7 @@ const std::string statusColumnHeader[] = {
     "VmPeakkB", "VmSizekB", "VmLckkB", "VmHWMkB", "VmRsskB", "VmSwapkB",
     "TotReadBytes", "CurReadBytesPerSec", "TotReadBytesStorage", "CurReadBytesStoragePerSec",
     "TotWrittenBytes", "CurWrittenBytesPerSec", "TotWrittenBytesStorage", "CurWrittenBytesStoragePerSec",
-    "TotReadCalls", "TotWriteCalls"
+    "TotReadCalls", "CurReadCalls", "TotWriteCalls", "CurWriteCalls"
 };
 
 /// stores all relevant data from /proc/pid/
