@@ -32,7 +32,7 @@ For deeper inspections you might want to watch the program directly from startup
 
 # Example Plots
 These are some example plots created with [gnuplot](http://gnuplot.sourceforge.net/) from [audria's output](https://raw.github.com/scaidermern/audria/master/plots/profile_firefox.txt).
-A starting firefox process was monitored right from the start:
+A *firefox* process was monitored right from the start:
 
 The first plot shows the CPU (current + average) and memory (allocated + actually used) usage:
 ![firefox CPU + memory usage](https://raw.github.com/scaidermern/audria/master/plots/profile_firefox_cpu+mem.png)
