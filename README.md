@@ -30,6 +30,18 @@ Usually it is sufficient to just pass the *PID* to monitor:
 For deeper inspections you might want to watch the program directly from startup and at a higher interval:  
 `audria -d 0.01 -e myProgram -myProgramArgument`
 
+# Example Plots
+These are some example plots created with [gnuplot](http://gnuplot.sourceforge.net/) from [audria's output](https://raw.github.com/scaidermern/audria/master/plots/profile_firefox.txt).
+A starting firefox process was monitored right from the start:
+
+The first plot shows the CPU (current + average) and memory (allocated + actually used) usage:
+![firefox CPU + memory usage](https://raw.github.com/scaidermern/audria/master/plots/profile_firefox_cpu+mem.png)
+
+The second plot visuializes the IO usage, especially the current number of read/written bytes/s and read/write calls: 
+![firefox IO usage](https://raw.github.com/scaidermern/audria/master/plots/profile_firefox_io.png)
+
+In the last plot we can see the relative time the process spend in user and kernel mode, as well as the current number of threads:
+![firefox user/system time + threads](https://raw.github.com/scaidermern/audria/master/plots/profile_firefox_utime+stime.png)
 
 # License   
 [GPL v3](http://www.gnu.org/licenses/gpl.html)
