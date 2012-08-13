@@ -1,8 +1,7 @@
 #ifndef DEFINITIONS_H
 #define DEFINITIONS_H DEFINITIONS_H
 
-#include <map>
-#include <string>
-#include <vector>
+#define likely(x)       __builtin_expect((x), 1)
+#define unlikely(x)     __builtin_expect((x), 0)
 
 #endif // DEFINITIONS_H

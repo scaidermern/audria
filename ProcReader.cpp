@@ -1,5 +1,6 @@
 #include "ProcReader.h"
 #include "helper.h"
+#include "definitions.h"
 
 #include <fstream>
 #include <iostream>
@@ -17,7 +18,7 @@ ProcReader::ProcReader(const std::string& processID) :
   pid(processID), hasRead(false), status(StatusColumnCount, "0.0"),
   cache(), canReadStat(false), canReadStatus(false), canReadIO(false) {
     // perform some checks
-    if (!dirExists("/proc/" + pid)) {
+    if (unlikely(!dirExists("/proc/" + pid))) {
         return;
     }
     
@@ -43,10 +44,10 @@ void ProcReader::readProcessStat() {
 	
     const std::string fileName = "/proc/" + pid + "/stat";
     std::ifstream file(fileName.c_str(), std::ifstream::in);
-    if (!file.good()) {
+    if (unlikely(!file.good())) {
         canReadStat = false;  // process may already have been terminated
-		return;
-	}
+        return;
+    }
 	
     std::string line;
     std::getline(file, line);
@@ -88,7 +89,7 @@ void ProcReader::readProcessStatus() {
 	
     const std::string fileName = "/proc/" + pid + "/status";
     std::ifstream file(fileName.c_str(), std::ifstream::in);
-    if (!file.good()) {
+    if (unlikely(!file.good())) {
         canReadStatus = false;  // process may already have been terminated
 		return;
 	}
@@ -128,14 +129,14 @@ void ProcReader::readProcessIO() {
 	
     const std::string fileName = "/proc/" + pid + "/io";
     std::ifstream file(fileName.c_str(), std::ifstream::in);
-    if (!file.good()) {
+    if (unlikely(!file.good())) {
         canReadIO = false;  // process may already have been terminated
         return;
 	}
     
     std::string line;
     while (std::getline(file, line)) {
-        if (line.empty())
+        if (unlikely(line.empty()))
             continue; // happens sometimes when self-profiling for some mysterious reason
         
         std::stringstream sstr(line);
@@ -170,7 +171,7 @@ void ProcReader::updateCache() {
 }
 
 void ProcReader::calcAll(const Cache& oldCache, const double elapsedSecs) {
-    if (cache.isEmpty) {
+    if (unlikely(cache.isEmpty)) {
         assert(false);
         return;
     }
@@ -186,7 +187,7 @@ void ProcReader::calcAll(const Cache& oldCache, const double elapsedSecs) {
 }
 
 void ProcReader::calcRuntime() {
-    if (cache.isEmpty) {
+    if (unlikely(cache.isEmpty)) {
         assert(false);
         return;
     }
@@ -194,7 +195,7 @@ void ProcReader::calcRuntime() {
     const double systemRuntimeSecs = uptime();
     const double processStarttimeSecs = cache.startTimeJiffies / (double)getHertz();
     
-    if (systemRuntimeSecs - processStarttimeSecs <= 0) {
+    if (unlikely(systemRuntimeSecs - processStarttimeSecs <= 0)) {
         cache.runTimeSecs = 0; // may happen with really short intervals shortly after process startup
     } else {
         cache.runTimeSecs = systemRuntimeSecs - processStarttimeSecs;
@@ -203,7 +204,7 @@ void ProcReader::calcRuntime() {
 }
 
 void ProcReader::calcUserSystemTimes() {
-    if (cache.isEmpty) {
+    if (unlikely(cache.isEmpty)) {
         assert(false);
         return;
     }
@@ -215,12 +216,12 @@ void ProcReader::calcUserSystemTimes() {
 }
 
 void ProcReader::calcCPUUtilization(const Cache& oldCache, const double elapsedSecs) {
-    if (cache.isEmpty) {
+    if (unlikely(cache.isEmpty)) {
         assert(false);
         return;
     }
     
-    if (cache.runTimeSecs == 0) { // really short interval and shortly after process startup
+    if (unlikely(cache.runTimeSecs == 0)) { // really short interval and shortly after process startup
         return;
     }
 
@@ -243,7 +244,7 @@ void ProcReader::calcIOUtilization(const Cache& oldCache, const double elapsedSe
         return;
     }
     
-    if (cache.runTimeSecs == 0) { // really short interval and shortly after process startup
+    if (unlikely(cache.runTimeSecs == 0)) { // really short interval and shortly after process startup
         return;
     }
     
@@ -260,7 +261,7 @@ PIDSet ProcReader::pids() {
     PIDSet pidSet;
 
     DIR* dir = opendir("/proc");
-    if (!dir) {
+    if (unlikely(!dir)) {
         std::cerr << "could not open /proc:" << strerror(errno) << std::endl;
         assert(false);
         return pidSet;

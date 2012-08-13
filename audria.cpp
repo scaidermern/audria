@@ -38,12 +38,13 @@
  *       that is also printing to stdout and thus scrambling this process' output)
  *
  */
- 
+
 #include "audria.h"
+#include "helper.h"
+#include "definitions.h"
 #include "ProcReader.h"
 #include "ProcCache.h"
 #include "TimeSpec.h"
-#include "helper.h"
 
 #include <fstream>
 #include <iostream>
@@ -60,9 +61,6 @@
 #include <sched.h>
 #include <sys/resource.h>
 #include <unistd.h>
-
-#define likely(x)       __builtin_expect((x), 1)
-#define unlikely(x)     __builtin_expect((x), 0)
 
 /// checks if all values in the current cache seem reasonable, just for debugging
 void checkCacheConsistency(const Cache& curCache, const Cache& oldCache) {
