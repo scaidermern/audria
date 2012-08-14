@@ -31,7 +31,6 @@
  *   - separate net I/O (how does iotop exclude this? maybe by counting only storage IO)
  *   - mysterious interval fuckup at startup, doesn't occur at system 'scy'
  *   - check kernel version? needed when checking each file separately?
- *   - escape ',' in process names on output (http://tools.ietf.org/html/rfc4180)
  *   - args:
  *     - wait for specific process? seems difficult, especially matching the name
  *     - print output to file instead of stdout (useful when using -e with a process
@@ -310,10 +309,16 @@ int main(int argc, char* argv[]) {
             const ProcessStatus& curStatus = pr.getProcessStatus();
 				  
 			std::cout << curTS;
-            for (ProcessStatus::const_iterator processStatusIt = curStatus.begin(); processStatusIt != curStatus.end(); ++processStatusIt) {
-				std::cout << "," << *processStatusIt;
-			}
-			std::cout << std::endl;
+            for (unsigned int statusColumn = 0; statusColumn < curStatus.size(); ++statusColumn) {
+                // if printing a program name containing a comma, enclose it in double-quotes (rfc4180 section 2.6)
+                if (unlikely(statusColumn == Name) &&
+                    unlikely(curStatus[statusColumn].find(",") != std::string::npos)) {
+                    std::cout << ",\"" << curStatus[statusColumn] << "\"";
+                } else {
+                    std::cout << "," << curStatus[statusColumn];
+                }
+            }
+            std::cout << std::endl;
 			
             process.oldStatusCache = curCache;
             process.oldStatusTS    = curTS;
