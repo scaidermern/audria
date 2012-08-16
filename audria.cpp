@@ -80,14 +80,16 @@ void checkCacheConsistency(const Cache& curCache, const Cache& oldCache) {
 
 void printUsage(const std::string& name) {
     std::cout << "Usage: " << name << " [OPTIONS] PID(s)" << std::endl
-              << "-a       monitor all processes" << std::endl
-              << "-d       delay in seconds between intervals (default: 0.5)" << std::endl
-              << "-e       program to execute and watch, all remaining arguments will be forwarded" << std::endl
-              << "-s       include self in list of processes to monitor" << std::endl
-              << "-n       number of iterations before quitting (default: unlimited)" << std::endl
-              << "-r       acquire real-time priority (lowest niceness, highest scheduling priority)," << std::endl
-              << "         usually requires root privileges or the CAP_SYS_NICE capability" << std::endl
-              << "-h       print this help and exit" << std::endl;
+              << "  -a        monitor all processes" << std::endl
+              << "  -d delay  delay in seconds between intervals (default: 0.5)" << std::endl
+              << "  -e cmd    program to execute and watch, all remaining arguments will be forwarded" << std::endl
+              << "  -s        include self in list of processes to monitor" << std::endl
+              << "  -n num    number of iterations before quitting (default: unlimited)" << std::endl
+              << "  -o file   file to write output to instead of stdout, will append to existing files," << std::endl
+              << "            if file is '-' then output will be written to stdout (default)" << std::endl
+              << "  -r        acquire real-time priority (lowest niceness, highest scheduling priority)," << std::endl
+              << "            usually requires root privileges or the CAP_SYS_NICE capability" << std::endl
+              << "  -h        print this help and exit" << std::endl;
     return;
 }
 
@@ -108,11 +110,12 @@ int main(int argc, char* argv[]) {
     double delaySecs = 0.5;
     int iterations   = 0;
     std::vector<char*> executeCmd;
+    std::ofstream logFile;
     
     // parse command line arguments
     // note: on errors we try to mimic getopt()'s error message as they have a funny style
     int c;
-    while ((c = getopt(argc, argv, "ad:e:sn:rh")) != -1) {
+    while ((c = getopt(argc, argv, "ad:e:sn:o:rh")) != -1) {
         switch (c) {
             case 'a':
                 monitorAll = true;
@@ -137,7 +140,6 @@ int main(int argc, char* argv[]) {
                 for (; optind < argc; ++optind) {
                     executeCmd.push_back(argv[optind]);
                 }
-                std::cout << std::endl;
                 break;
             case 's':
                 monitorOwn = true;
@@ -156,6 +158,15 @@ int main(int argc, char* argv[]) {
                     exit(EXIT_FAILURE);
                 }
                 break;
+            case 'o':
+                if (std::string(optarg) != "-") {
+                    logFile.open(optarg, std::ios::app);
+                    if (!logFile) {
+                        std::cerr << argv[0] << ": could not open file '" << optarg << "'' for appending: " << strerror(errno) << std::endl;
+                        exit(EXIT_FAILURE);
+                    }
+                }
+                break;
             case 'r':
                 rtPriority = true;
                 break;
@@ -171,6 +182,9 @@ int main(int argc, char* argv[]) {
                 break;
         }
     }
+
+    // output device
+    std::ostream& log = logFile.is_open() ? logFile : std::cout;
     
     // add self if requested
     ProcessMap processes;
@@ -247,11 +261,11 @@ int main(int argc, char* argv[]) {
     }
 
     // print column headers
-    std::cout << "Time";
+    log << "Time";
     for (int i = 0; i < StatusColumnCount; ++i) {
-        std::cout << "," << statusColumnHeader[i];
+        log << "," << statusColumnHeader[i];
     }
-    std::cout << std::endl;
+    log << std::endl;
     
     const TimeSpec intervalTS(delaySecs);
     TimeSpec wakeupTS;
@@ -308,17 +322,17 @@ int main(int argc, char* argv[]) {
 			
             const ProcessStatus& curStatus = pr.getProcessStatus();
 				  
-			std::cout << curTS;
+            log << curTS;
             for (unsigned int statusColumn = 0; statusColumn < curStatus.size(); ++statusColumn) {
                 // if printing a program name containing a comma, enclose it in double-quotes (rfc4180 section 2.6)
                 if (unlikely(statusColumn == Name) &&
                     unlikely(curStatus[statusColumn].find(",") != std::string::npos)) {
-                    std::cout << ",\"" << curStatus[statusColumn] << "\"";
+                    log << ",\"" << curStatus[statusColumn] << "\"";
                 } else {
-                    std::cout << "," << curStatus[statusColumn];
+                    log << "," << curStatus[statusColumn];
                 }
             }
-            std::cout << std::endl;
+            log << std::endl;
 			
             process.oldStatusCache = curCache;
             process.oldStatusTS    = curTS;
