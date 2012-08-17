@@ -28,8 +28,7 @@
  * 
  *  @todo:
  *   - syscalls?
- *   - separate net I/O (how does iotop exclude this? maybe by counting only storage IO)
- *   - mysterious interval fuckup at startup, doesn't occur at system 'scy'
+ *   - per process net I/O (only works by capturing packets via pcap ;/)
  *   - check kernel version? needed when checking each file separately?
  *   - option to show userland threads?
  *   - args:
