@@ -17,15 +17,18 @@ This allows very detailed inspections of the resource usage of a process.
 
 *audria* has several command line arguments:
 
-    PID(s)   PID(s) to monitor
-    -a       monitor all processes
-    -d       delay in seconds between intervals (default: 0.5)
-    -e       program to execute and watch, all remaining arguments will be forwarded
-    -s       include self in list of processes to monitor
-    -n       number of iterations before quitting (default: unlimited)
-    -r       acquire real-time priority (lowest niceness, highest scheduling priority),
-             usually requires root privileges or the CAP_SYS_NICE capability
-    -h       print this help and exit
+    PID(s)    PID(s) to monitor
+    -a        monitor all processes
+    -d delay  delay in seconds between intervals (default: 0.5)
+    -e cmd    program to execute and watch, all remaining arguments will be forwarded
+    -k        show kernel threads (default: false)
+    -n num    number of iterations before quitting (default: unlimited)
+    -o file   file to write output to instead of stdout, will append to existing files,
+              if file is '-' then output will be written to stdout (default)
+    -r        acquire real-time priority (lowest niceness, highest scheduling priority),
+              usually requires root privileges or the CAP_SYS_NICE capability
+    -s        include self in list of processes to monitor
+    -h        print this help and exit
 
 Usually it is sufficient to just pass the *PID* to monitor:  
 `audria $(pidof myProgram)`
