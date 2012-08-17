@@ -47,8 +47,10 @@ std::string numberToString(const T number) {
 /// or std::numeric_limits<double>::quiet_NaN() on error
 double uptime();
 
-/// returns the kernel's hz value, might be wrong, see 'proc/sysinfo.c'
-/// from the 'procps' package for other crappy ways of obtaining this value
+/// returns the kernel ticks per second (hz rate) as reported by sysconf
+/// according to 'proc/sysinfo.c' from the 'procps' package (where 'top' comes from) this
+/// value might be wrong. this file also lists other crappy ways of obtaining this value.
+/// htop also uses _SC_CLK_TCK from sysconf().
 long getHertz();
 
 #endif // HELPER_H

@@ -31,6 +31,7 @@
  *   - separate net I/O (how does iotop exclude this? maybe by counting only storage IO)
  *   - mysterious interval fuckup at startup, doesn't occur at system 'scy'
  *   - check kernel version? needed when checking each file separately?
+ *   - option to show userland threads?
  *   - args:
  *     - wait for specific process? seems difficult, especially matching the name
  *     - print output to file instead of stdout (useful when using -e with a process
@@ -83,12 +84,13 @@ void printUsage(const std::string& name) {
               << "  -a        monitor all processes" << std::endl
               << "  -d delay  delay in seconds between intervals (default: 0.5)" << std::endl
               << "  -e cmd    program to execute and watch, all remaining arguments will be forwarded" << std::endl
-              << "  -s        include self in list of processes to monitor" << std::endl
+              << "  -k        show kernel threads (default: false)" << std::endl
               << "  -n num    number of iterations before quitting (default: unlimited)" << std::endl
               << "  -o file   file to write output to instead of stdout, will append to existing files," << std::endl
               << "            if file is '-' then output will be written to stdout (default)" << std::endl
               << "  -r        acquire real-time priority (lowest niceness, highest scheduling priority)," << std::endl
               << "            usually requires root privileges or the CAP_SYS_NICE capability" << std::endl
+              << "  -s        include self in list of processes to monitor" << std::endl
               << "  -h        print this help and exit" << std::endl;
     return;
 }
@@ -106,6 +108,7 @@ int main(int argc, char* argv[]) {
     // default argument values
     bool monitorAll  = false;
     bool monitorOwn  = false;
+    bool monitorKThreads = false;
     bool rtPriority  = false;
     double delaySecs = 0.5;
     int iterations   = 0;
@@ -115,7 +118,7 @@ int main(int argc, char* argv[]) {
     // parse command line arguments
     // note: on errors we try to mimic getopt()'s error message as they have a funny style
     int c;
-    while ((c = getopt(argc, argv, "ad:e:sn:o:rh")) != -1) {
+    while ((c = getopt(argc, argv, "ad:e:kn:o:rsh")) != -1) {
         switch (c) {
             case 'a':
                 monitorAll = true;
@@ -141,8 +144,8 @@ int main(int argc, char* argv[]) {
                     executeCmd.push_back(argv[optind]);
                 }
                 break;
-            case 's':
-                monitorOwn = true;
+            case 'k':
+                monitorKThreads = true;
                 break;
             case 'n':
                 if (isNumber(optarg)) {
@@ -169,6 +172,9 @@ int main(int argc, char* argv[]) {
                 break;
             case 'r':
                 rtPriority = true;
+                break;
+            case 's':
+                monitorOwn = true;
                 break;
             case 'h':
                 printUsage(argv[0]);
@@ -312,6 +318,10 @@ int main(int argc, char* argv[]) {
 			
             ProcReader pr(process.pid);
 			pr.readAll();
+
+            if (!monitorKThreads && pr.isKernelThread()) {
+                continue;
+            }
 			
 			pr.updateCache();
 			

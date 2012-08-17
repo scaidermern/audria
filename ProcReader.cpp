@@ -71,8 +71,8 @@ void ProcReader::readProcessStat() {
     
     // remaining fields can be parsed easily as there are no unexpected spaces
     std::string skip;
-    sstr >> status[State] >> status[PPID]
-         >> skip >> skip >> skip >> skip >> skip
+    sstr >> status[State] >> status[PPID] >> status[PGRP]
+         >> skip >> skip >> skip >> skip
          >> status[MinFlt] >> skip >> status[MajFlt] >> skip
          >> status[UserTimeJiffies] >> status[SystemTimeJiffies] >> skip >> skip
          >> status[Priority] >> status[Nice] >> status[Threads]

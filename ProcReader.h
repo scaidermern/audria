@@ -12,6 +12,7 @@ typedef enum {
     State,                  ///< process state
     PID,                    ///< process ID
     PPID,                   ///< parent process ID
+    PGRP,                   ///< process group ID
     AvgCPUPerc,             ///< average CPU Utilization, in percent
     CurCPUPerc,             ///< current utilization since last iteration, in percent
     MinFlt,                 ///< minor page faults
@@ -47,7 +48,7 @@ typedef enum {
 } StatusColumns;
 
 const std::string statusColumnHeader[] = {
-    "Name", "State", "PID", "PPID", "AvgCPUPerc", "CurCPUPerc", "MinFlt", "MajFlt",
+    "Name", "State", "PID", "PPID", "PGRP", "AvgCPUPerc", "CurCPUPerc", "MinFlt", "MajFlt",
     "UserTimeJiffies", "SystemTimeJiffies", "UserTimePerc", "SystemTimePerc", 
     "Priority", "Nice", "Threads", "StartTimeJiffies", "RunTimeSecs",
     "VmPeakkB", "VmSizekB", "VmLckkB", "VmHWMkB", "VmRsskB", "VmSwapkB",
@@ -103,6 +104,9 @@ class ProcReader {
     
     /// calculates current IO load
     void calcIOUtilization(const Cache& oldCache, const double elapsedSecs);
+
+    /// returns wether this process is a kernel thread
+    bool isKernelThread() const { return status[PGRP] == "0"; }
     
     /// returns data we have read and processed
     const ProcessStatus& getProcessStatus() const { return status; }
