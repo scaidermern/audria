@@ -31,10 +31,6 @@
  *   - per process net I/O (only works by capturing packets via pcap ;/)
  *   - check kernel version? needed when checking each file separately?
  *   - option to show userland threads?
- *   - args:
- *     - wait for specific process? seems difficult, especially matching the name
- *     - print output to file instead of stdout (useful when using -e with a process
- *       that is also printing to stdout and thus scrambling this process' output)
  *
  */
 
