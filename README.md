@@ -21,6 +21,7 @@ This allows very detailed inspections of the resource usage of a process.
     -a        monitor all processes
     -d delay  delay in seconds between intervals (default: 0.5)
     -e cmd    program to execute and watch, all remaining arguments will be forwarded
+    -f fields names of fields to show, separated by comma (default: all)
     -k        show kernel threads (default: false)
     -n num    number of iterations before quitting (default: unlimited)
     -o file   file to write output to instead of stdout, will append to existing files,
@@ -30,13 +31,18 @@ This allows very detailed inspections of the resource usage of a process.
     -s        include self in list of processes to monitor
     -h        print this help and exit
 
+## Example Usage
+
 Usually it is sufficient to just pass the *PID* to monitor:  
 `audria $(pidof myProgram)`
 
 For deeper inspections you might want to watch the program directly from startup and at a higher interval:  
 `audria -d 0.01 -e myProgram -myProgramArgument`
 
-# Example Plots
+You can also specify which fields to show:
+`audria -f Name,CurCPUPerc,Threads,VmSizekB,CurReadBytesPerSec,CurWrittenBytesPerSec -a`
+
+## Example Plots
 These are some example plots created with [gnuplot](http://gnuplot.sourceforge.net/) from [audria's output](https://raw.github.com/scaidermern/audria/master/plots/profile_firefox.txt).
 A *firefox* process was monitored right from the start:
 

@@ -45,6 +45,7 @@
 #include <iostream>
 #include <list>
 #include <map>
+#include <set>
 #include <string>
 #include <vector>
 #include <cassert>
@@ -74,11 +75,36 @@ void checkCacheConsistency(const Cache& curCache, const Cache& oldCache) {
     assert(curCache.totWriteCalls >= oldCache.totWriteCalls || curCache.totWriteCalls == 0);
 }
 
+/// parses status column fields from a string and returns the corresponding internal IDs as a set
+/// @note: in case of errors, an empty set is returned
+std::set<int> parseFieldsFromString(const std::string& str) {
+    std::stringstream sstream(str);
+    std::string field;
+    std::set<int> fields;
+    while (std::getline(sstream, field, ',')) {
+        bool fieldValid = false;
+        for (int statusColumnID = 0; statusColumnID < StatusColumnCount; ++statusColumnID) {
+            if (statusColumnHeader[statusColumnID] == field) {
+                fields.insert(statusColumnID);
+                fieldValid = true;
+                break;
+            }
+        }
+
+        if (!fieldValid) {
+            return std::set<int>();
+        }
+    }
+
+    return fields;
+}
+
 void printUsage(const std::string& name) {
     std::cout << "Usage: " << name << " [OPTIONS] PID(s)" << std::endl
               << "  -a        monitor all processes" << std::endl
               << "  -d delay  delay in seconds between intervals (default: 0.5)" << std::endl
               << "  -e cmd    program to execute and watch, all remaining arguments will be forwarded" << std::endl
+              << "  -f fields names of fields to show, separated by comma (default: all)" << std::endl
               << "  -k        show kernel threads (default: false)" << std::endl
               << "  -n num    number of iterations before quitting (default: unlimited)" << std::endl
               << "  -o file   file to write output to instead of stdout, will append to existing files," << std::endl
@@ -107,13 +133,14 @@ int main(int argc, char* argv[]) {
     bool rtPriority  = false;
     double delaySecs = 0.5;
     int iterations   = 0;
+    std::set<int> fields;
     std::vector<char*> executeCmd;
     std::ofstream logFile;
     
     // parse command line arguments
     // note: on errors we try to mimic getopt()'s error message as they have a funny style
     int c;
-    while ((c = getopt(argc, argv, "ad:e:kn:o:rsh")) != -1) {
+    while ((c = getopt(argc, argv, "ad:e:f:kn:o:rsh")) != -1) {
         switch (c) {
             case 'a':
                 monitorAll = true;
@@ -137,6 +164,14 @@ int main(int argc, char* argv[]) {
                 // gather all remaining arguments
                 for (; optind < argc; ++optind) {
                     executeCmd.push_back(argv[optind]);
+                }
+                break;
+            case 'f':
+                fields = parseFieldsFromString(optarg);
+                if (fields.empty()) {
+                    std::cerr << argv[0] << ": could not parse all given fields" << std::endl;
+                    printUsage(argv[0]);
+                    exit(EXIT_FAILURE);
                 }
                 break;
             case 'k':
@@ -263,8 +298,10 @@ int main(int argc, char* argv[]) {
 
     // print column headers
     log << "Time";
-    for (int i = 0; i < StatusColumnCount; ++i) {
-        log << "," << statusColumnHeader[i];
+    for (int statusColumn = 0; statusColumn < StatusColumnCount; ++statusColumn) {
+        // skip unwanted fields
+        if (!fields.empty() && fields.count(statusColumn) == 0) continue;
+        log << "," << statusColumnHeader[statusColumn];
     }
     log << std::endl;
     
@@ -329,6 +366,9 @@ int main(int argc, char* argv[]) {
 				  
             log << curTS;
             for (unsigned int statusColumn = 0; statusColumn < curStatus.size(); ++statusColumn) {
+                // skip unwanted fields
+                if (!fields.empty() && fields.count(statusColumn) == 0) continue;
+
                 // if printing a program name containing a comma, enclose it in double-quotes (rfc4180 section 2.6)
                 if (unlikely(statusColumn == Name) &&
                     unlikely(curStatus[statusColumn].find(",") != std::string::npos)) {
