@@ -20,7 +20,7 @@ This allows very detailed inspections of the resource usage of a process.
     PID(s)    PID(s) to monitor
     -a        monitor all processes
     -d delay  delay in seconds between intervals (default: 0.5), specify '-1' to use
-              2 * kernel clock tick rate (2 * 1/100 on most systems), note: values close or below
+              2 * kernel clock tick rate (2 * 1/100 on most systems), note: values equal or below
               the kernel clock tick rate will lead to bogus values for the 'CurCPUPerc' field
     -e cmd    program to execute and watch, all remaining arguments will be forwarded
     -f fields names of fields to show, separated by comma (default: all)
