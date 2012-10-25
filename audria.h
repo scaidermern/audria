@@ -25,7 +25,7 @@ typedef std::map<std::string, Process> ProcessMap;
 class Process {
   public:
     Process(const std::string& processID) : pid(processID), status(), oldStatusCache(), oldStatusTS() {}
-    /// returns wether the process still exists
+    /// returns whether the process still exists
     bool exists() const { return dirExists("/proc/" + pid); }
 
     std::string    pid;

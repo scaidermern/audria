@@ -105,7 +105,7 @@ class ProcReader {
     /// calculates current IO load
     void calcIOUtilization(const Cache& oldCache, const double elapsedSecs);
 
-    /// returns wether this process is a kernel thread
+    /// returns whether this process is a kernel thread
     bool isKernelThread() const { return status[PGRP] == "0"; }
     
     /// returns data we have read and processed

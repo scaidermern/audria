@@ -6,13 +6,13 @@
 #include <string>
 #include <cassert>
 
-/// returns wether the given directory exists
+/// returns whether the given directory exists
 bool dirExists(const std::string& dir);
 
-/// returns wether the given file is readable
+/// returns whether the given file is readable
 bool fileReadable(const std::string& path);
 
-/// returns wether the given string is a number
+/// returns whether the given string is a number
 /// @note doesn't detect all errors, but is fast
 bool isNumber(const std::string& str);
 

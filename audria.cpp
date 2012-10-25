@@ -102,7 +102,9 @@ std::set<int> parseFieldsFromString(const std::string& str) {
 void printUsage(const std::string& name) {
     std::cout << "Usage: " << name << " [OPTIONS] PID(s)" << std::endl
               << "  -a        monitor all processes" << std::endl
-              << "  -d delay  delay in seconds between intervals (default: 0.5)" << std::endl
+              << "  -d delay  delay in seconds between intervals (default: 0.5), specify '-1' to use" << std::endl
+              << "            2 * kernel clock tick rate (2 * 1/100 on most systems), note: values close or below"<< std::endl
+              << "            the kernel clock tick rate will lead to bogus values for the 'CurCPUPerc' field" << std::endl
               << "  -e cmd    program to execute and watch, all remaining arguments will be forwarded" << std::endl
               << "  -f fields names of fields to show, separated by comma (default: all)" << std::endl
               << "  -k        show kernel threads (default: false)" << std::endl
@@ -146,10 +148,12 @@ int main(int argc, char* argv[]) {
                 monitorAll = true;
                 break;
             case 'd':
-                if (isNumber(optarg)) {
+                if (std::string(optarg) == "-1") {
+                    delaySecs = 2 / (double)getHertz();
+                } else if (isNumber(optarg)) {
                     delaySecs = stringToNumber<double>(optarg);
                     if (delaySecs < 0.0) {
-                        std::cerr << argv[0] << ": option requires a positive number as argument -- '" << (char)c << "'" << std::endl;
+                        std::cerr << argv[0] << ": option requires a positive number or -1 as argument -- '" << (char)c << "'" << std::endl;
                         printUsage(argv[0]);
                         exit(EXIT_FAILURE);
                     }
@@ -217,6 +221,16 @@ int main(int argc, char* argv[]) {
                 exit(EXIT_FAILURE);
                 break;
         }
+    }
+
+    // check if specified delay is valid
+    if (delaySecs <= 1 / (double)getHertz() &&
+        (fields.empty() || fields.count(CurCPUPerc) == 1)) {
+        std::cerr << "warning: interval close or below kernel clock tick rate (" << (1 / (double)getHertz())
+                  << "), expect bogus values for the 'CurCPUPerc' field" << std::endl;
+    } else if ((int)(1 / (double) delaySecs) % getHertz() != 0) {
+        std::cerr << "warning: interval not a multiple of kernel clock tick rate (" << (1 / (double)getHertz())
+                  << "), expect bogus values for the 'CurCPUPerc' field" << std::endl;
     }
 
     // output device
