@@ -38,7 +38,7 @@ endif
 
 # tests, don't build in release mode
 tests: $(OBJSTEST)
-ifneq ($(mode),release)
+ifeq ($(mode),debug)
 	$(CXX) $(OBJSTEST) $(CXXFLAGS) -g $(LDFLAGS) -o $@
 endif
 
