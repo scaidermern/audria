@@ -49,6 +49,7 @@
 #include <string>
 #include <vector>
 #include <cassert>
+#include <cmath>
 #include <cstdlib>
 #include <cstring>
 #include <ctime>
@@ -63,6 +64,7 @@
 void checkCacheConsistency(const Cache& curCache, const Cache& oldCache) {
 	if (oldCache.isEmpty) return;
     
+    (void)curCache; // skip warning in release build
     assert(curCache.userTimeJiffies >= oldCache.userTimeJiffies || curCache.userTimeJiffies == 0);
     assert(curCache.systemTimeJiffies >= oldCache.systemTimeJiffies || curCache.systemTimeJiffies == 0);
     assert(curCache.startTimeJiffies >= oldCache.startTimeJiffies || curCache.startTimeJiffies == 0);
@@ -226,12 +228,14 @@ int main(int argc, char* argv[]) {
     // check if specified delay is valid
     if (delaySecs <= 1 / (double)getHertz() &&
         (fields.empty() || fields.count(CurCPUPerc) == 1)) {
-        std::cerr << "warning: interval equal or below kernel clock tick rate (" << (1 / (double)getHertz())
-                  << "), expect bogus values for the 'CurCPUPerc' field" << std::endl;
-    } else if ((int)(1 / (double) delaySecs) % getHertz() != 0 &&
+        std::cerr << "warning: interval " << delaySecs << " equal or below "
+                  << "kernel tick rate (" << (1.0 / (double)getHertz()) << "), "
+                  << "expect bogus values for the 'CurCPUPerc' field" << std::endl;
+    } else if (fmod(getHertz(), (1.0 / (double) delaySecs)) != 0 &&
                (fields.empty() || fields.count(CurCPUPerc) == 1)) {
-        std::cerr << "warning: interval not a multiple of kernel clock tick rate (" << (1 / (double)getHertz())
-                  << "), expect bogus values for the 'CurCPUPerc' field" << std::endl;
+        std::cerr << "warning: iterations per second (" << (1.0 / delaySecs) << ") not a multiple of "
+                  << "kernel ticks per second (" << (double)getHertz() << "), "
+                  << "expect bogus values for the 'CurCPUPerc' field" << std::endl;
     }
 
     // output device
