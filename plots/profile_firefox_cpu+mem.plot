@@ -25,8 +25,8 @@ set y2range[0:]
 
 set datafile separator ","
 
-plot "profile_firefox.txt" using 18:($19/1024) axes x1y2 title "VirtMem" with filledcurves x1 linecolor 5,\
-     "profile_firefox.txt" using 18:($22/1024) axes x1y2 title "VMemRSS" with filledcurves x1 linecolor 3,\
-     "profile_firefox.txt" using 18:6  axes x1y1 title "Average CPU" smooth csplines linewidth 1.5 linecolor 8, \
-     "profile_firefox.txt" using 18:7  axes x1y1 title "Current CPU" smooth csplines linewidth 1.5 linecolor 1
+plot "profile_firefox.txt" using 19:($20/1024) axes x1y2 title "VirtMem" with filledcurves x1 linecolor 5,\
+     "profile_firefox.txt" using 19:($23/1024) axes x1y2 title "VMemRSS" with filledcurves x1 linecolor 3,\
+     "profile_firefox.txt" using 19:7  axes x1y1 title "Average CPU" smooth csplines linewidth 1.5 linecolor 8, \
+     "profile_firefox.txt" using 19:8  axes x1y1 title "Current CPU" smooth csplines linewidth 1.5 linecolor 1
 

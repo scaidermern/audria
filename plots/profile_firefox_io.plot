@@ -20,7 +20,7 @@ set ytics
 set yrange[0:]
 
 set datafile separator ","
-plot "profile_firefox.txt" using 18:($28/1024/1024) axes x1y1 title "read" with filledcurves x1 linecolor 1,\
-     "profile_firefox.txt" using 18:($32/1024/1024) axes x1y1 title "write" with filledcurves x1 linecolor 3,\
-     "profile_firefox.txt" using 18:34 axes x1y2 title "read calls" with filledcurves x1 linecolor 4,\
-     "profile_firefox.txt" using 18:36 axes x1y2 title "write calls" with filledcurves x1 linecolor 5
+plot "profile_firefox.txt" using 19:($29/1024/1024) axes x1y1 title "read" with filledcurves x1 linecolor 1,\
+     "profile_firefox.txt" using 19:($33/1024/1024) axes x1y1 title "write" with filledcurves x1 linecolor 3,\
+     "profile_firefox.txt" using 19:35 axes x1y2 title "read calls" with filledcurves x1 linecolor 4,\
+     "profile_firefox.txt" using 19:37 axes x1y2 title "write calls" with filledcurves x1 linecolor 5

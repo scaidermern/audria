@@ -24,6 +24,6 @@ set y2tics
 set y2range[0:]
 
 set datafile separator ","
-plot "profile_firefox.txt" using 18:12 axes x1y1 title "user mode" with filledcurves x1 linecolor 2,\
-     "profile_firefox.txt" using 18:13 axes x1y1 title "kernel mode" with filledcurves x1 linecolor 1,\
-     "profile_firefox.txt" using 18:16 axes x1y2 title "threads" with lines linecolor 3
+plot "profile_firefox.txt" using 19:13 axes x1y1 title "user mode" with filledcurves x1 linecolor 2,\
+     "profile_firefox.txt" using 19:14 axes x1y1 title "kernel mode" with filledcurves x1 linecolor 1,\
+     "profile_firefox.txt" using 19:17 axes x1y2 title "threads" with lines linecolor 3
