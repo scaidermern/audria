@@ -1,16 +1,16 @@
 #
-# builds by default in debug mode
-# call with mode=release to build in release mode
+# builds by default in release mode
+# call with mode=debug to build in debug mode
 #
 
 CXX = g++
 CXXFLAGS = -Wall -Wextra -Weffc++ -Wshadow #-Wconversion
 LDFLAGS = -lrt
 
-ifeq ($(mode),release)
-	CXXFLAGS += -Os -DNDEBUG
-else
+ifeq ($(mode),debug)
 	CXXFLAGS += -O1 -g
+else
+	CXXFLAGS += -Os -DNDEBUG
 endif
 
 SRCS=audria.cpp ProcReader.cpp ProcCache.cpp TimeSpec.cpp helper.cpp
@@ -23,10 +23,10 @@ all: info audria tests
 
 # info message in which mode to build
 info:
-ifeq ($(mode),release)
-	@echo "building in RELEASE mode\n"
-else
+ifeq ($(mode),debug)
 	@echo "building in DEBUG mode\n"
+else
+	@echo "building in RELEASE mode\n"
 endif
 
 # our project
