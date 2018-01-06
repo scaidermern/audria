@@ -72,7 +72,7 @@ class ProcReader {
     /// combines @ref readProcessStat(), @ref readProcessStatus() and @ref readProcessIO()
     void readAll();
 
-    /// parses various information from /proc/pid/status
+    /// parses various information from /proc/pid/stat
     void readProcessStat();
 
     /// parses memory-related information from /proc/pid/status
