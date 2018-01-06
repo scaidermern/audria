@@ -25,7 +25,7 @@ TimeSpec::TimeSpec(const double secs) : ts() {
 double TimeSpec::seconds() const {
     return (double)ts.tv_sec + (double)ts.tv_nsec / (double)secInNsec;
 }
-    
+
 bool TimeSpec::operator==(const TimeSpec& other) const {
     return (ts.tv_sec  ==  other.ts.tv_sec) &&
            (ts.tv_nsec == other.ts.tv_nsec);

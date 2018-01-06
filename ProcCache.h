@@ -12,11 +12,11 @@ class Cache {
   public:
     /// creates an empty cache
     Cache();
-    
+
     /// creates a cache from a @ref processStatus
     /// @note @ref runTimeSecs has to be filled later
     Cache(const ProcessStatus &status);
-    
+
     bool               isEmpty;
     unsigned long long userTimeJiffies;
     unsigned long long systemTimeJiffies;

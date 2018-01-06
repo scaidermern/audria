@@ -67,62 +67,62 @@ class ProcReader {
   public:
     /// constructs a ProcReader object for the given PID
     ProcReader(const std::string& processID);
-    
+
     /// reads all interesting information from /proc,
     /// combines @ref readProcessStat(), @ref readProcessStatus() and @ref readProcessIO()
     void readAll();
-    
+
     /// parses various information from /proc/pid/status
     void readProcessStat();
-    
+
     /// parses memory-related information from /proc/pid/status
     /// @note: we parse the memory-related information from /proc/pid/status
     ///        instead of/proc/pid/stat because status has more information
     void readProcessStatus();
-    
+
     /// parses IO information from /proc/pid/io
     void readProcessIO();
-    
+
     /// updates data cache, has to be called before any of the calc functions
     /// @note don't call multiple times
     void updateCache();
-    
+
     /// processes all read information,
     /// combines @ref calcRuntime(), @ref calcUserSystemTimes(),
     /// @ref calcCPUUtilization() and @ref calcIOUtilization()
     void calcAll(const Cache& oldCache, const double elapsedSecs);
-    
+
     /// calculates total process runtime in seconds
     /// and fills @ref runTimeSecs in @p cache
     void calcRuntime();
-    
+
     /// calculates user and system times in percent
     void calcUserSystemTimes();
-    
+
     /// calculates average and current CPU usage
     void calcCPUUtilization(const Cache& oldCache, const double elapsedSecs);
-    
+
     /// calculates current IO load
     void calcIOUtilization(const Cache& oldCache, const double elapsedSecs);
 
     /// returns whether this process is a kernel thread
     bool isKernelThread() const { return status[PGRP] == "0"; }
-    
+
     /// returns data we have read and processed
     const ProcessStatus& getProcessStatus() const { return status; }
-    
+
     /// returns internal data cache
     const Cache& getCache() const { return cache; }
 
     /// returns a set of all current PIDs
     static PIDSet pids();
-    
+
   private:
     std::string    pid;     ///< PID to read, stored as string for performance reasons (requires no conversions)
     bool           hasRead; ///< stores if we have read any data from /proc at all
     ProcessStatus  status;  ///< data we have read and processed
     Cache          cache;   ///< cache for read data
-    
+
     bool           canReadStat;    ///< can we read /proc/pid/stat?
     bool           canReadStatus;  ///< can we read /proc/pid/status?
     bool           canReadIO;      ///< can we read /proc/pid/io?

@@ -21,11 +21,11 @@ ProcReader::ProcReader(const std::string& processID) :
     if (unlikely(!dirExists("/proc/" + pid))) {
         return;
     }
-    
+
     canReadStat   = fileReadable("/proc/" + pid + "/stat");
     canReadStatus = fileReadable("/proc/" + pid + "/status");
     canReadIO     = fileReadable("/proc/" + pid + "/io");
-    
+
     assert(canReadStat);   // can this fail? where/when?
     assert(canReadStatus); // can this fail? where/when?
 }
@@ -37,27 +37,27 @@ void ProcReader::readAll() {
 }
 
 void ProcReader::readProcessStat() {
-	assert(status.size() == StatusColumnCount);
-    
+    assert(status.size() == StatusColumnCount);
+
     if (!canReadStat)
         return;
-	
+
     const std::string fileName = "/proc/" + pid + "/stat";
     std::ifstream file(fileName.c_str(), std::ifstream::in);
     if (unlikely(!file.good())) {
         canReadStat = false;  // process may already have been terminated
         return;
     }
-	
+
     std::string line;
     std::getline(file, line);
     assert(!line.empty());
-    
+
     std::stringstream sstr(line);
-    
+
     // read first field
     sstr >> status[PID];
-    
+
     // second field is the executable name in brackets, may contain spaces and other bad characters
     // example name from readproc.c ":-) 1 2 3 4 5 6" -> reverse search for closing bracket ')'
     const std::string& tmpStr = sstr.str();
@@ -65,10 +65,10 @@ void ProcReader::readProcessStat() {
     const size_t cmdEnd   = tmpStr.rfind(")");
     status[Name] = tmpStr.substr(cmdStart, cmdEnd - cmdStart);
     assert(!status[Name].empty());
-    
+
     // skip first two fields
     sstr.seekg(cmdEnd + 1);
-    
+
     // remaining fields can be parsed easily as there are no unexpected spaces
     std::string skip;
     sstr >> status[State] >> status[PPID] >> status[PGRP]
@@ -77,26 +77,26 @@ void ProcReader::readProcessStat() {
          >> status[UserTimeJiffies] >> status[SystemTimeJiffies] >> skip >> skip
          >> status[Priority] >> status[Nice] >> status[Threads]
          >> skip >> status[StartTimeJiffies];
-    
+
     hasRead = true;
 }
 
 void ProcReader::readProcessStatus() {
-	assert(status.size() == StatusColumnCount);
-    
+    assert(status.size() == StatusColumnCount);
+
     if (!canReadStatus)
         return;
-	
+
     const std::string fileName = "/proc/" + pid + "/status";
     std::ifstream file(fileName.c_str(), std::ifstream::in);
     if (unlikely(!file.good())) {
         canReadStatus = false;  // process may already have been terminated
-		return;
-	}
-    
+        return;
+    }
+
     std::string line;
     while (std::getline(file, line)) {
-		assert(!line.empty());
+        assert(!line.empty());
         std::stringstream sstr(line);
         std::string name, value;
         sstr >> name >> value;
@@ -105,7 +105,7 @@ void ProcReader::readProcessStatus() {
         }
         assert(!name.empty());
         assert(!value.empty() || name == "Groups:");
-        
+
         if        (name == "VmPeak:") {
             status[VmPeakkB] = value;
         } else if (name == "VmSize:") {
@@ -120,28 +120,28 @@ void ProcReader::readProcessStatus() {
             status[VmSwapkB] = value;
         }
     }
-    
+
     hasRead = true;
 }
 
 void ProcReader::readProcessIO() {
-	assert(status.size() == StatusColumnCount);
-    
+    assert(status.size() == StatusColumnCount);
+
     if (!canReadIO)
         return;
-	
+
     const std::string fileName = "/proc/" + pid + "/io";
     std::ifstream file(fileName.c_str(), std::ifstream::in);
     if (unlikely(!file.good())) {
         canReadIO = false;  // process may already have been terminated
         return;
-	}
-    
+    }
+
     std::string line;
     while (std::getline(file, line)) {
         if (unlikely(line.empty()))
             continue; // happens sometimes when self-profiling for some mysterious reason
-        
+
         std::stringstream sstr(line);
         assert(sstr);
         std::string name, value;
@@ -151,7 +151,7 @@ void ProcReader::readProcessIO() {
         }
         assert(!name.empty());
         assert(!value.empty());
-        
+
         if        (name == "rchar:") {
             status[TotReadBytes] = value;
         } else if (name == "wchar:") {
@@ -166,7 +166,7 @@ void ProcReader::readProcessIO() {
             status[TotWriteCalls] = value;
         }
     }
-    
+
     hasRead = true;
 }
 
@@ -184,7 +184,7 @@ void ProcReader::calcAll(const Cache& oldCache, const double elapsedSecs) {
     if (!hasRead) {
         return; // process may already have been terminated
     }
-    
+
     calcRuntime();
     calcUserSystemTimes();
     calcCPUUtilization(oldCache, elapsedSecs);
@@ -196,10 +196,10 @@ void ProcReader::calcRuntime() {
         assert(false);
         return;
     }
-    
+
     const double systemRuntimeSecs = uptime();
     const double processStarttimeSecs = cache.startTimeJiffies / (double)getHertz();
-    
+
     if (unlikely(systemRuntimeSecs - processStarttimeSecs <= 0)) {
         cache.runTimeSecs = 0; // may happen with really short intervals shortly after process startup
     } else {
@@ -213,9 +213,9 @@ void ProcReader::calcUserSystemTimes() {
         assert(false);
         return;
     }
-    
+
     const int totProcessCPUTimeJiffies = cache.userTimeJiffies + cache.systemTimeJiffies;
-    
+
     status[UserTimePerc]   = numberToString(cache.userTimeJiffies   * 100.0 / (double)totProcessCPUTimeJiffies);
     status[SystemTimePerc] = numberToString(cache.systemTimeJiffies * 100.0 / (double)totProcessCPUTimeJiffies);
 }
@@ -225,18 +225,18 @@ void ProcReader::calcCPUUtilization(const Cache& oldCache, const double elapsedS
         assert(false);
         return;
     }
-    
+
     if (unlikely(cache.runTimeSecs == 0)) { // really short interval and shortly after process startup
         return;
     }
 
     const double totProcessCPUTimeSecs = (cache.userTimeJiffies + cache.systemTimeJiffies) / (double)getHertz();
     status[AvgCPUPerc] = numberToString((totProcessCPUTimeSecs * 100.0) / cache.runTimeSecs);
-    
+
     if (oldCache.isEmpty) { // first iteration, cannot calculate current CPU
         return;
     }
-    
+
     const double oldTotProcessCPUTimeSecs = (oldCache.userTimeJiffies + oldCache.systemTimeJiffies) / (double)getHertz();
     const double elapsedCPUTimeSecs = totProcessCPUTimeSecs - oldTotProcessCPUTimeSecs;
     assert(elapsedCPUTimeSecs >= 0);
@@ -248,14 +248,14 @@ void ProcReader::calcIOUtilization(const Cache& oldCache, const double elapsedSe
         assert(false);
         return;
     }
-    
+
     if (unlikely(cache.runTimeSecs == 0)) { // really short interval and shortly after process startup
         return;
     }
-    
+
     if (oldCache.isEmpty) // first iteration, cannot calculate current IO
         return;
-    
+
     status[CurReadBytes]           = numberToString((cache.totReadBytes - oldCache.totReadBytes) / elapsedSecs);
     status[CurWrittenBytes]        = numberToString((cache.totWrittenBytes - oldCache.totWrittenBytes) / elapsedSecs);
     status[CurReadBytesStorage]    = numberToString((cache.totReadBytesStorage - oldCache.totReadBytesStorage) / elapsedSecs);
