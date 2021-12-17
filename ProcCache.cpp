@@ -10,14 +10,14 @@ Cache::Cache() : isEmpty(true),
 
 Cache::Cache(const ProcessStatus& status) :
   isEmpty(false),
-  userTimeJiffies(stringToNumber<unsigned long long>(status[UserTimeJiffies])),
-  systemTimeJiffies(stringToNumber<unsigned long long>(status[SystemTimeJiffies])),
-  startTimeJiffies(stringToNumber<unsigned long long>(status[StartTimeJiffies])),
+  userTimeJiffies(stringToNumber<uint64_t>(status[UserTimeJiffies])),
+  systemTimeJiffies(stringToNumber<uint64_t>(status[SystemTimeJiffies])),
+  startTimeJiffies(stringToNumber<uint64_t>(status[StartTimeJiffies])),
   runTimeSecs(0.0),
-  totReadBytes(stringToNumber<unsigned long long>(status[TotReadBytes])),
-  totReadBytesStorage(stringToNumber<unsigned long long>(status[TotReadBytesStorage])),
-  totWrittenBytes(stringToNumber<unsigned long long>(status[TotWrittenBytes])),
-  totWrittenBytesStorage(stringToNumber<unsigned long long>(status[TotWrittenBytesStorage])),
-  totReadCalls(stringToNumber<unsigned long long>(status[TotReadCalls])),
-  totWriteCalls(stringToNumber<unsigned long long>(status[TotWriteCalls])) {
+  totReadBytes(stringToNumber<uint64_t>(status[TotReadBytes])),
+  totReadBytesStorage(stringToNumber<uint64_t>(status[TotReadBytesStorage])),
+  totWrittenBytes(stringToNumber<uint64_t>(status[TotWrittenBytes])),
+  totWrittenBytesStorage(stringToNumber<uint64_t>(status[TotWrittenBytesStorage])),
+  totReadCalls(stringToNumber<uint64_t>(status[TotReadCalls])),
+  totWriteCalls(stringToNumber<uint64_t>(status[TotWriteCalls])) {
 }

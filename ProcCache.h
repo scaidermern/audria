@@ -1,6 +1,7 @@
 #ifndef PROC_CACHE_H
 #define PROC_CACHE_H PROC_CACHE_H
 
+#include <cstdint>
 #include <string>
 #include <vector>
 
@@ -17,17 +18,17 @@ class Cache {
     /// @note @ref runTimeSecs has to be filled later
     Cache(const ProcessStatus &status);
 
-    bool               isEmpty;
-    unsigned long long userTimeJiffies;
-    unsigned long long systemTimeJiffies;
-    unsigned long long startTimeJiffies;
-    double             runTimeSecs;
-    unsigned long long totReadBytes;
-    unsigned long long totReadBytesStorage;
-    unsigned long long totWrittenBytes;
-    unsigned long long totWrittenBytesStorage;
-    unsigned long long totReadCalls;
-    unsigned long long totWriteCalls;
+    bool     isEmpty;
+    uint64_t userTimeJiffies;
+    uint64_t systemTimeJiffies;
+    uint64_t startTimeJiffies;
+    double   runTimeSecs;
+    uint64_t totReadBytes;
+    uint64_t totReadBytesStorage;
+    uint64_t totWrittenBytes;
+    uint64_t totWrittenBytesStorage;
+    uint64_t totReadCalls;
+    uint64_t totWriteCalls;
 };
 
 #endif // PROC_CACHE_H
