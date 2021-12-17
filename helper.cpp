@@ -16,15 +16,15 @@
 bool dirExists(const std::string& dir) {
     assert(!dir.empty());
     
-	struct stat st;
-	stat(dir.c_str(), &st);
-	return S_ISDIR(st.st_mode);
+    struct stat st;
+    stat(dir.c_str(), &st);
+    return S_ISDIR(st.st_mode);
 }
 
 bool fileReadable(const std::string& path) {
     assert(!path.empty());
     
-	return access(path.c_str(), R_OK) == 0;
+    return access(path.c_str(), R_OK) == 0;
 }
 
 bool isNumber(const std::string& str) {
@@ -35,10 +35,10 @@ double uptime() {
     static const std::string fileName = "/proc/uptime";
     std::ifstream file(fileName.c_str(), std::ifstream::in);
     if (!file.good()) {
-		std::cerr << "could not open " << fileName << ": " << strerror(errno) << std::endl;
+        std::cerr << "could not open " << fileName << ": " << strerror(errno) << std::endl;
         assert(false);
         return std::numeric_limits<double>::quiet_NaN();
-	}
+    }
     
     std::string time;
     file >> time;

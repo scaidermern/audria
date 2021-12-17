@@ -62,7 +62,7 @@
 
 /// checks if all values in the current cache seem reasonable, just for debugging
 void checkCacheConsistency(const Cache& curCache, const Cache& oldCache) {
-	if (oldCache.isEmpty) return;
+    if (oldCache.isEmpty) return;
     
     (void)curCache; // skip warning in release build
     assert(curCache.userTimeJiffies >= oldCache.userTimeJiffies || curCache.userTimeJiffies == 0);
@@ -362,27 +362,27 @@ int main(int argc, char* argv[]) {
         }
 
         for (ProcessMap::iterator processIt = processes.begin(); processIt != processes.end(); ++processIt) {
-			TimeSpec curTS;
-			clock_gettime(clockSource, &curTS.ts);
+            TimeSpec curTS;
+            clock_gettime(clockSource, &curTS.ts);
             Process& process = processIt->second;
             const TimeSpec& elapsedTS = curTS - process.oldStatusTS;
-			
+
             ProcReader pr(process.pid);
-			pr.readAll();
+            pr.readAll();
 
             if (!monitorKThreads && pr.isKernelThread()) {
                 continue;
             }
-			
-			pr.updateCache();
-			
+
+            pr.updateCache();
+
             pr.calcAll(process.oldStatusCache, elapsedTS.seconds());
-			
-			const Cache& curCache = pr.getCache();
+
+            const Cache& curCache = pr.getCache();
             checkCacheConsistency(curCache, process.oldStatusCache);
-			
+
             const ProcessStatus& curStatus = pr.getProcessStatus();
-				  
+
             log << curTS;
             for (unsigned int statusColumn = 0; statusColumn < curStatus.size(); ++statusColumn) {
                 // skip unwanted fields
@@ -397,11 +397,11 @@ int main(int argc, char* argv[]) {
                 }
             }
             log << std::endl;
-			
+
             process.oldStatusCache = curCache;
             process.oldStatusTS    = curTS;
-		}
-		
+        }
+
         if (delaySecs != 0.0) {
             TimeSpec curTS;
             clock_gettime(clockSource, &curTS.ts);
@@ -422,7 +422,7 @@ int main(int argc, char* argv[]) {
             
             clock_nanosleep(CLOCK_MONOTONIC, TIMER_ABSTIME, &wakeupTS.ts, NULL);
         }
-	}
+    }
     
     return 0;
 }
