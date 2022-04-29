@@ -35,29 +35,36 @@ This allows very detailed inspections of the resource usage of a process.
 
 ## Example Usage
 
-Usually it is sufficient to just pass the *PID* to monitor:  
-`audria $(pidof myProgram)`
+Usually it is sufficient to just pass the *PID* you want to monitor and optionally the name of the output file:
+`audria $(pidof myProgram) -o data.txt`
 
-For deeper inspections you might want to watch the program directly from startup and at a higher interval:  
-`audria -d -1 -e myProgram -myProgramArgument`
+For deeper inspections you might want to watch the program directly from startup and at a higher interval:
+`audria -d -1 -o data.txt -e myProgram -myProgramArgument`
 
 You can also specify which fields to show:
 `audria -f Name,CurCPUPerc,Threads,VmSizekB,CurReadBytesPerSec,CurWrittenBytesPerSec -a`
 
-## Example Plots
-These are some example plots created with [gnuplot](http://gnuplot.sourceforge.net/) from [audria's output](https://raw.github.com/scaidermern/audria/master/plots/profile_firefox.txt).
+## Plotting
+
+audria generates a CSV-like output which is suitable for plotting.
+For the [gnuplot](http://gnuplot.sourceforge.net/) software you can use the example file `example.plot` as a start.
+It will plot several graphs based on the generated data, assuming this data has been stored as `data.txt`.
+Just install gnuplot and run `gnuplot example.plot` to generate the graphs.
+
+### Example Plots
+These are some example plots created with gnuplot from [audria's output](https://raw.github.com/scaidermern/audria/master/plots/profile_firefox.txt).
 A *firefox* process was monitored right from the start:
 
 The first plot shows the *CPU* (current + average) and *memory* (allocated + actually used) usage.
 Seems like IO is the bottleneck at startup as the CPU is only occasionally active:
 ![firefox CPU + memory usage](https://raw.github.com/scaidermern/audria/master/plots/profile_firefox_cpu+mem.png)
 
-The second plot visuializes the *IO load*, especially the current number of read/written bytes/s and read/write calls: 
+The second plot visuializes the *IO load*, especially the current number of read/written bytes/s and read/write calls:
 ![firefox IO usage](https://raw.github.com/scaidermern/audria/master/plots/profile_firefox_io.png)
 
 In the last plot we can see the relative time the process spend in *user* and *kernel mode*, as well as the current number of *threads*:
 ![firefox user/system time + threads](https://raw.github.com/scaidermern/audria/master/plots/profile_firefox_utime+stime.png)
 
-# License   
+# License
 [GPL v3](http://www.gnu.org/licenses/gpl.html)
 (c) [Alexander Heinlein](http://choerbaert.org)
