@@ -36,12 +36,15 @@ This allows very detailed inspections of the resource usage of a process.
 ## Example Usage
 
 Usually it is sufficient to just pass the *PID* you want to monitor and optionally the name of the output file:
+
 `audria $(pidof myProgram) -o data.txt`
 
 For deeper inspections you might want to watch the program directly from startup and at a higher interval:
+
 `audria -d -1 -o data.txt -e myProgram -myProgramArgument`
 
 You can also specify which fields to show:
+
 `audria -f Name,CurCPUPerc,Threads,VmSizekB,CurReadBytesPerSec,CurWrittenBytesPerSec -a`
 
 ## Plotting
