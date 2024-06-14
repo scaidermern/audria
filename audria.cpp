@@ -331,9 +331,18 @@ int main(int argc, char* argv[]) {
     int i = 0;
     while (iterations == 0 || ++i <= iterations) {
         // check if process to execute is still running
-        if (childPid != -1 && !waitpid(childPid, 0, WNOHANG) == 0) {
+        int childStatus;
+        if (childPid != -1 && !waitpid(childPid, &childStatus, WNOHANG) == 0) {
             std::cerr << "child " << childPid << " terminated, exiting" << std::endl;
-            exit(EXIT_SUCCESS);
+            int exitStatus;
+            if (WIFSIGNALED(childStatus)) {
+              exitStatus = 128 + WTERMSIG(childStatus);
+            } else if (WIFEXITED(childStatus)) {
+              exitStatus = WEXITSTATUS(childStatus);
+            } else {
+              exitStatus = 1;
+            }
+            exit(exitStatus);
         }
 
         // check if all processes still exist, remove terminated ones

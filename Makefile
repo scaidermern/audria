@@ -5,7 +5,7 @@
 
 CXX = g++
 CXXFLAGS = -Wall -Wextra -Weffc++ -Wshadow #-Wconversion
-LDFLAGS = -lrt
+LDFLAGS = -lrt -static
 
 ifeq ($(mode),debug)
 	CXXFLAGS += -O1 -g
